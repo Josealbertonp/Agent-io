@@ -34,10 +34,10 @@ export function AgentPanel({ agents, connectionStatus, events }: AgentPanelProps
           </p>
         ) : (
           <div className="panel-empty" data-testid="panel-empty">
-            <span className="panel-empty__icon" aria-hidden>
-              ◇
-            </span>
-            <p className="empty-state">Selecione um agente no escritório ou na lista.</p>
+            <p className="panel-empty__kicker">Select an agent</p>
+            <p className="empty-state">
+              Choose an agent in the workspace to inspect activity, position and connection details.
+            </p>
           </div>
         )}
       </aside>

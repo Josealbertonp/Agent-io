@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { AgentView } from '../view/agentViewModel';
-import { LABEL, formatNameLine } from '../view/labelLayout';
+import { formatNameLine } from '../view/labelLayout';
 import {
   characterAssetKey,
   poseAnimKey,
@@ -25,23 +25,22 @@ export class AgentMarker {
     this.id = view.id;
     this.characterIndex = view.characterIndex;
 
-    this.ring = scene.add.circle(0, 2, 18, 0x000000, 0);
-    this.ring.setStrokeStyle(2, 0xf5d76e, 0);
+    this.ring = scene.add.circle(0, 2, 12, 0x000000, 0);
+    this.ring.setStrokeStyle(1, 0xf5d76e, 0);
 
     this.sprite = scene.add.sprite(0, 0, characterAssetKey(view.characterIndex), 0);
     this.sprite.setOrigin(0.5, 0.75);
+    this.sprite.setScale(0.72);
 
-    this.statusDot = scene.add.circle(-14, LABEL.nameOffsetY - 3, 2.5, view.statusVisual.color, 1);
+    this.statusDot = scene.add.circle(-8, 11, 1.6, view.statusVisual.color, 1);
 
-    this.nameText = scene.add.text(0, LABEL.nameOffsetY, '', {
+    this.nameText = scene.add.text(0, 13, '', {
       fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-      fontSize: `${LABEL.nameFontPx}px`,
-      color: '#d4d4d8',
-      stroke: '#0c0c10',
-      strokeThickness: 2,
+      fontSize: '5px',
+      color: '#a1a1aa',
       align: 'center',
     });
-    this.nameText.setOrigin(0.5, 1);
+    this.nameText.setOrigin(0.5, 0);
 
     this.container = scene.add.container(view.x, view.y, [
       this.ring,
@@ -62,9 +61,10 @@ export class AgentMarker {
 
   setSelected(selected: boolean): void {
     this.selected = selected;
-    this.ring.setStrokeStyle(2, 0xf5d76e, selected ? 1 : 0);
-    this.container.setScale(selected ? 1.06 : 1);
-    this.nameText.setColor(selected ? '#fafafa' : '#d4d4d8');
+    this.ring.setStrokeStyle(1, 0xf5d76e, selected ? 0.9 : 0);
+    this.sprite.setScale(selected ? 0.8 : 0.72);
+    this.nameText.setColor(selected ? '#e4e4e7' : '#8b8b96');
+    this.nameText.setAlpha(selected ? 1 : 0.62);
   }
 
   isSelected(): boolean {

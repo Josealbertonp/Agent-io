@@ -281,6 +281,7 @@ describe('Etapa 4 — interface operacional', () => {
     }));
 
     expect(filterAgentsByStatus(agents, 'all')).toHaveLength(9);
+    expect(filterAgentsByStatus(agents, 'online')).toHaveLength(8);
     for (const status of statuses) {
       const filtered = filterAgentsByStatus(agents, status);
       expect(filtered).toHaveLength(1);

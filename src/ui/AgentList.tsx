@@ -61,7 +61,7 @@ export function AgentList({ agents, statusFilter }: AgentListProps) {
                 </span>
               </span>
               <span className="agent-list__meta">{agent.role}</span>
-              <span className="agent-list__meta">
+              <span className="agent-list__meta agent-list__meta--muted">
                 {displayProviderOrModel(agent.provider)}/{displayProviderOrModel(agent.model)}
               </span>
             </button>

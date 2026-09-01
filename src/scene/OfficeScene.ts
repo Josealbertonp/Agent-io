@@ -55,7 +55,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#1a1a22');
+    this.cameras.main.setBackgroundColor('#121218');
     this.registerCharacterAnims();
     this.buildTileLayers();
     this.placeFurniture();
@@ -139,7 +139,8 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     if (floorTiles) {
       const floor = floorMap.createLayer(0, floorTiles, 0, 0);
       floor?.setDepth(0);
-      floor?.setAlpha(0.55);
+      floor?.setAlpha(0.28);
+      floor?.setTint(0xb8b8c4);
     }
 
     const wallMap = this.make.tilemap({
@@ -156,6 +157,8 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     if (wallTiles) {
       const walls = wallMap.createLayer(0, wallTiles, 0, 0);
       walls?.setDepth(1);
+      walls?.setAlpha(0.4);
+      walls?.setTint(0x8a8a96);
     }
   }
 
@@ -178,6 +181,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
       const sprite = this.add.image(prop.tileX * TILE_SIZE, prop.tileY * TILE_SIZE, key);
       sprite.setOrigin(0, 0);
       sprite.setDepth(prop.key === 'desk' || prop.key === 'chair' ? 5 : 4);
+      sprite.setAlpha(prop.key === 'desk' || prop.key === 'chair' ? 0.92 : 0.78);
     }
   }
 
@@ -204,18 +208,16 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
 
   private placeZoneLabels(): void {
     for (const zone of OFFICE_ZONES) {
-      const x = (zone.x + zone.w / 2) * TILE_SIZE;
-      const y = zone.y * TILE_SIZE + 6;
+      const x = (zone.x + 0.4) * TILE_SIZE;
+      const y = zone.y * TILE_SIZE + 2;
       const label = this.add.text(x, y, zone.label.toUpperCase(), {
         fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-        fontSize: '8px',
-        color: '#a1a1aa',
-        stroke: '#0c0c10',
-        strokeThickness: 2,
+        fontSize: '6px',
+        color: '#9ca3af',
       });
-      label.setOrigin(0.5, 0);
+      label.setOrigin(0, 0);
       label.setDepth(3);
-      label.setAlpha(0.85);
+      label.setAlpha(0.42);
     }
   }
 }

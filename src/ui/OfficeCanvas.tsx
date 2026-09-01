@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { useProjectedStore } from '../domain';
 import { resetAgentViewCache, selectAgentViews } from '../view/agentViewModel';
-import { CANVAS_HEIGHT, MAP_HEIGHT, MAP_WIDTH, MAP_ZOOM, TILE_SIZE } from '../view/officeMap';
+import { MAP_HEIGHT, MAP_WIDTH, TILE_SIZE } from '../view/officeMap';
 import { OfficeScene, OFFICE_READY_EVENT, OFFICE_SCENE_KEY } from '../scene/OfficeScene';
 import { useSelectionStore } from './selectionStore';
 
@@ -72,14 +72,14 @@ export function OfficeCanvas() {
       parent,
       width: MAP_WIDTH * TILE_SIZE,
       height: MAP_HEIGHT * TILE_SIZE,
-      backgroundColor: '#1a1a22',
+      backgroundColor: '#121218',
       pixelArt: true,
       antialias: false,
       scene: [OfficeScene],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        zoom: MAP_ZOOM,
+        zoom: 1,
       },
       callbacks: {
         postBoot: (booted) => {
@@ -122,7 +122,8 @@ export function OfficeCanvas() {
     <div
       ref={hostRef}
       data-testid="office-canvas"
-      style={{ width: '100%', height: '100%', minHeight: CANVAS_HEIGHT, overflow: 'hidden' }}
+      className="office-canvas-host"
+      style={{ width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}
     />
   );
 }

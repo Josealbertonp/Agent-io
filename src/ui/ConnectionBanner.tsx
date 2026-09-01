@@ -63,10 +63,6 @@ export function ConnectionBanner({
 }: ConnectionBannerProps) {
   const kind = tone(feedMode, connectionStatus, transportStatus);
   const isLive = feedMode === 'sse';
-  const summary = isLive
-    ? `Ao vivo · ${transportLabel(transportStatus)} · ${maestriLabel(connectionStatus)}`
-    : `dados locais, não é o Maestri ao vivo · ${maestriLabel(connectionStatus)}`;
-  const detail = isLive && transportDetail ? ` — ${transportDetail}` : '';
 
   return (
     <div
@@ -80,10 +76,14 @@ export function ConnectionBanner({
       <span className={isLive ? 'feed-pill feed-pill--live' : 'feed-pill feed-pill--demo'}>
         {isLive ? 'LIVE' : 'DEMO'}
       </span>
-      <span className="connection-banner__text">
-        {summary}
-        {detail}
-      </span>
+      {isLive ? (
+        <span className="status-chip">Ao vivo</span>
+      ) : (
+        <span className="status-chip">dados locais</span>
+      )}
+      {isLive ? <span className="status-chip">{transportLabel(transportStatus)}</span> : null}
+      <span className="status-chip">{maestriLabel(connectionStatus)}</span>
+      {isLive && transportDetail ? <span className="status-chip status-chip--detail">{transportDetail}</span> : null}
     </div>
   );
 }

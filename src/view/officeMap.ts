@@ -116,7 +116,7 @@ export function buildFloorLayer(): number[][] {
         if (zone === 'lounge') row.push(ROOM_TILE.FLOOR_LOUNGE);
         else if (zone === 'support') row.push(ROOM_TILE.FLOOR_DARK);
         else if (zone === 'meeting') row.push(ROOM_TILE.FLOOR_ALT);
-        else row.push((x + y) % 2 === 0 ? ROOM_TILE.FLOOR : ROOM_TILE.FLOOR_ALT);
+        else row.push(ROOM_TILE.FLOOR);
       }
     }
     data.push(row);
