@@ -28,7 +28,9 @@ Há estados sem dados para: nenhum agente projetado, nenhum evento, seleção re
 
 ## Decisão de contrato e débito
 
-Foi adotada a Opção A: `src/adapter/differ.ts` estende o payload dos eventos com metadados de inferência (`statusConfidence`, `statusEvidence`, `statusInference` e, quando disponível, `currentActivity`), sem alterar o schema Zod nem o `Agent` canônico. Isso mantém os derivados rastreáveis no evento e evita duplicação de estado. Débito: o `eventLog` é apenas memória de apresentação, volátil e sem deduplicação por `eventId`.
+Foi adotada a Opção A: `src/adapter/differ.ts` estende o payload dos eventos com os campos soltos `statusConfidence`, `statusEvidence` e, quando disponível, `currentActivity`, sem alterar o schema Zod nem o `Agent` canônico. O vazamento anterior de inferência via `payload.metadata -> Agent.metadata` foi resolvido: `inferenceMetadata` foi removida e o campo `metadata` não é mais enviado. Testes de regressão cobrem o contrato em `src/adapter/adapter.test.ts` e `src/domain/projection.test.ts`.
+
+O eventLog continua sendo apenas memória de apresentação, volátil e sem deduplicação por `eventId` (backlog menor).
 
 ## Débitos conhecidos
 
@@ -39,13 +41,20 @@ Foi adotada a Opção A: `src/adapter/differ.ts` estende o payload dos eventos c
 - Bundle aproximado de 1,72 MB, sem code-split.
 - `eventLog` volátil e sem dedupe por `eventId`.
 
+### Resolvido no gate
+
+- Vazamento de metadados de inferência do payload para `Agent.metadata`, corrigido em `src/adapter/differ.ts` e coberto pelos testes de regressão.
+
+## Pareceres finais
+
+- Torque: **APROVADO**.
+- Prisma: **APROVO COM BACKLOG**.
+
 ## Evidência do gate
 
 - Branch: `main`.
-- Head confirmado antes do handoff: `61729c0cdcbaf2d7d0c64b537a55d9612144a5ce`.
-- Working tree: limpo antes da alteração documental.
-- Validação: `npm.cmd test` falhou ao carregar `vite.config.ts` por `Error: spawn EPERM` no `esbuild`; `npm.cmd run build` passou pelo `tsc` e falhou na etapa Vite pelo mesmo `spawn EPERM`. Não houve alteração em `src/`, testes ou configuração.
-- Arquivos de implementação inspecionados: `src/ui/selectionStore.ts`, `eventLog.ts`, `agentExtras.ts`, `filterAgents.ts`, `displayLabels.ts`, `AgentList.tsx`, `OfficeCanvas.tsx`, `AgentPanel.tsx`, `EventTimeline.tsx`, `StatusFilter.tsx`, `ConnectionBanner.tsx`, `src/adapter/differ.ts`.
+- Validação final reportada: `vitest` — 114 passaram, 1 skip; `tsc` — 0; `vite build` — 0.
+- Arquivos de implementação/documentação relacionados: `src/ui/selectionStore.ts`, `eventLog.ts`, `agentExtras.ts`, `filterAgents.ts`, `displayLabels.ts`, `AgentList.tsx`, `OfficeCanvas.tsx`, `AgentPanel.tsx`, `EventTimeline.tsx`, `StatusFilter.tsx`, `ConnectionBanner.tsx`, `src/adapter/differ.ts`, `src/adapter/adapter.test.ts`, `src/domain/projection.test.ts`.
 
 ## Rastreabilidade e Preview
 

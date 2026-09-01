@@ -17,14 +17,6 @@ export function generateDeterministicEventId(
   return `evt-${hashString(seed)}`;
 }
 
-function inferenceMetadata(agent: NormalizedAgentState): Record<string, unknown> {
-  return {
-    statusConfidence: agent.statusConfidence,
-    statusEvidence: agent.statusEvidence,
-    statusInference: agent.statusConfidence === 'high' ? 'default' : 'heuristic',
-  };
-}
-
 /**
  * Calcula a lista de eventos canônicos resultantes da diferença entre dois snapshots consecutivos.
  *
@@ -102,7 +94,6 @@ export function diffSnapshots(
           statusEvidence: currAgent.statusEvidence,
           // Opção A (Etapa 4): extras de inferência no payload, NÃO no schema Agent.
           ...(currAgent.currentActivity ? { currentActivity: currAgent.currentActivity } : {}),
-          metadata: inferenceMetadata(currAgent),
         },
       });
 
@@ -160,7 +151,6 @@ export function diffSnapshots(
             statusConfidence: currAgent.statusConfidence,
             statusEvidence: currAgent.statusEvidence,
             ...(currAgent.currentActivity ? { currentActivity: currAgent.currentActivity } : {}),
-            metadata: inferenceMetadata(currAgent),
           },
         });
       }

@@ -214,6 +214,57 @@ Portals:
       expect(events.map((e) => e.type)).toEqual(['agent.connected', 'activity.started']);
       expect(events[0].payload.currentActivity).toBe('executing');
       expect(events[0].payload.statusConfidence).toBe('high');
+      expect(events[0].payload).not.toHaveProperty('metadata');
+    });
+
+    it('não injeta metadata de inferência em agent.connected nem agent.status_changed', () => {
+      const connected = diffSnapshots(
+        snap(),
+        snap({
+          timestamp: '2026-08-31T12:01:00.000Z',
+          agents: {
+            'agent-dev': agent({
+              id: 'agent-dev',
+              name: 'Developer',
+              status: 'working',
+              statusConfidence: 'low',
+              statusEvidence: 'heuristic-idle',
+            }),
+          },
+          rawHash: 'hash-1',
+        }),
+        1
+      ).events.find((e) => e.type === 'agent.connected');
+
+      expect(connected).toBeDefined();
+      expect(connected!.payload).not.toHaveProperty('metadata');
+      expect(connected!.payload.statusConfidence).toBe('low');
+      expect(connected!.payload.statusEvidence).toBe('heuristic-idle');
+
+      const statusChanged = diffSnapshots(
+        snap({
+          agents: { 'agent-dev': agent({ id: 'agent-dev', name: 'Developer', status: 'idle' }) },
+        }),
+        snap({
+          timestamp: '2026-08-31T12:01:00.000Z',
+          agents: {
+            'agent-dev': agent({
+              id: 'agent-dev',
+              name: 'Developer',
+              status: 'working',
+              statusConfidence: 'medium',
+              statusEvidence: 'working-activity',
+            }),
+          },
+          rawHash: 'hash-1',
+        }),
+        1
+      ).events.find((e) => e.type === 'agent.status_changed');
+
+      expect(statusChanged).toBeDefined();
+      expect(statusChanged!.payload).not.toHaveProperty('metadata');
+      expect(statusChanged!.payload.statusConfidence).toBe('medium');
+      expect(statusChanged!.payload.statusEvidence).toBe('working-activity');
     });
 
     it('mesmo diff lógico em timestamps diferentes → MESMO eventId', () => {

@@ -14,6 +14,8 @@ import {
   useProjectedStore,
 } from './index';
 import { saveSnapshotToFile, loadSnapshotFromFile } from './snapshot.node';
+import { diffSnapshots } from '../adapter/differ';
+import type { NormalizedAgentState, WorkspaceSnapshot } from '../adapter/types';
 
 describe('Domain Projection Core (Etapa 1.1)', () => {
   beforeEach(() => {
@@ -665,6 +667,47 @@ describe('Domain Projection Core (Etapa 1.1)', () => {
       store.restoreSnapshotString(snapshotString);
       expect(useProjectedStore.getState().seenEventIds.size).toBe(11);
       expect(useProjectedStore.getState().agents['agent-planner-01']).toBeDefined();
+    });
+  });
+
+  describe('Opção A: inferência não entra em Agent.metadata', () => {
+    it('após agent.connected vindo do differ, metadata não contém statusConfidence/statusEvidence', () => {
+      const agentState: NormalizedAgentState = {
+        id: 'agent-dev',
+        workspaceId: 'ws-1',
+        name: 'Developer',
+        provider: 'unknown',
+        model: 'unknown',
+        providerKnown: false,
+        role: 'Agent',
+        status: 'working',
+        statusConfidence: 'low',
+        statusEvidence: 'heuristic-idle',
+        position: { x: 0, y: 0 },
+      };
+      const prev: WorkspaceSnapshot = {
+        workspaceId: 'ws-1',
+        timestamp: '2026-08-31T12:00:00.000Z',
+        connectionStatus: 'connected',
+        agents: {},
+        rawHash: 'hash-0',
+      };
+      const curr: WorkspaceSnapshot = {
+        ...prev,
+        timestamp: '2026-08-31T12:01:00.000Z',
+        agents: { 'agent-dev': agentState },
+        rawHash: 'hash-1',
+      };
+
+      const { events } = diffSnapshots(prev, curr, 1);
+      const connected = events.find((e) => e.type === 'agent.connected');
+      expect(connected).toBeDefined();
+
+      const state = applyEvents(createInitialState(), [connected!]);
+      const metadata = state.agents['agent-dev']?.metadata;
+      expect(metadata?.statusConfidence).toBeUndefined();
+      expect(metadata?.statusEvidence).toBeUndefined();
+      expect(metadata?.statusInference).toBeUndefined();
     });
   });
 });
