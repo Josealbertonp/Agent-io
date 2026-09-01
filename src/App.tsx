@@ -70,7 +70,7 @@ export function App() {
         <OfficeShell />
       </main>
       <footer className="app-credit">
-        Tiles e personagens: LimeZu Modern Office + Modern Interiors — créditos obrigatórios.
+        Visual assets: LimeZu (https://limezu.itch.io/) — credit required.
       </footer>
     </div>
   );

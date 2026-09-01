@@ -1,26 +1,19 @@
-Modern Office tileset
+LimeZu assets
 Author: LimeZu
-Source: https://limezu.itch.io/moderninteriors
+https://limezu.itch.io/
 
-This project USES the Modern Office asset inside the Agent-IO application.
-It does not resell or redistribute the pack as a standalone asset.
+Credit is required.
 
-License (from LICENSE.txt, included alongside these copies):
+This project uses LimeZu Modern Office and Modern Interiors art inside Agent-IO.
+The public repository does not redistribute the purchased asset pack or the
+character/furniture copies required for the full office scene.
+
+License terms we rely on (see LICENSE.txt and LICENSE-INTERIORS.txt):
 - You CAN edit and use the asset in any commercial or non-commercial project.
 - You CAN'T resell or distribute the asset to others, nor edit and resell it.
-- Credits are appreciated.
+- Credits required.
 
-Credits: Modern Office by LimeZu.
-
----
-
-Modern Interiors (full version) — characters and selected furniture singles
-Author: LimeZu
-License: LICENSE-INTERIORS.txt (credits required; pack must not be redistributed).
-
-This app copies only:
-- six Character Generator premade 32×32 sheets (`characters/agent-0.png` … `agent-5.png`)
-- Conference_Hall_Singles_1.png → conference-table.png
-- Living_Room_Singles_1.png → lounge-sofa.png
-
-The purchased Interiors pack at the repository root is not versioned.
+Characters and Interiors singles used locally (not committed):
+- public/office/characters/agent-0.png … agent-5.png
+- public/office/conference-table.png
+- public/office/lounge-sofa.png
