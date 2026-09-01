@@ -7,6 +7,7 @@ import {
   buildWallLayer,
   FURNITURE,
   OFFICE_ZONES,
+  OFFICE_VIEW,
 } from '../view/officeMap';
 import { OFFICE_ASSET_KEYS, OFFICE_ASSET_URLS } from './officeAssets';
 import { AgentMarker } from './agentMarker';
@@ -55,8 +56,10 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#121218');
+    this.cameras.main.setBackgroundColor('#16161c');
+    this.cameras.main.setScroll(OFFICE_VIEW.scrollX, OFFICE_VIEW.scrollY);
     this.registerCharacterAnims();
+    this.paintRoomBase();
     this.buildTileLayers();
     this.placeFurniture();
     this.placeZoneLabels();
@@ -139,8 +142,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     if (floorTiles) {
       const floor = floorMap.createLayer(0, floorTiles, 0, 0);
       floor?.setDepth(0);
-      floor?.setAlpha(0.28);
-      floor?.setTint(0xb8b8c4);
+      floor?.setAlpha(0.16);
     }
 
     const wallMap = this.make.tilemap({
@@ -157,8 +159,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     if (wallTiles) {
       const walls = wallMap.createLayer(0, wallTiles, 0, 0);
       walls?.setDepth(1);
-      walls?.setAlpha(0.4);
-      walls?.setTint(0x8a8a96);
+      walls?.setAlpha(0.32);
     }
   }
 
@@ -181,7 +182,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
       const sprite = this.add.image(prop.tileX * TILE_SIZE, prop.tileY * TILE_SIZE, key);
       sprite.setOrigin(0, 0);
       sprite.setDepth(prop.key === 'desk' || prop.key === 'chair' ? 5 : 4);
-      sprite.setAlpha(prop.key === 'desk' || prop.key === 'chair' ? 0.92 : 0.78);
+      sprite.setAlpha(1);
     }
   }
 
@@ -206,18 +207,33 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     }
   }
 
+  private paintRoomBase(): void {
+    const fills: Record<string, number> = {
+      work: 0x2a2a33,
+      meeting: 0x243028,
+      lounge: 0x322820,
+      support: 0x222830,
+    };
+    const g = this.add.graphics();
+    g.setDepth(0);
+    for (const zone of OFFICE_ZONES) {
+      g.fillStyle(fills[zone.id] ?? 0x2a2a33, 1);
+      g.fillRect(zone.x * TILE_SIZE, zone.y * TILE_SIZE, zone.w * TILE_SIZE, zone.h * TILE_SIZE);
+    }
+  }
+
   private placeZoneLabels(): void {
     for (const zone of OFFICE_ZONES) {
-      const x = (zone.x + 0.4) * TILE_SIZE;
-      const y = zone.y * TILE_SIZE + 2;
+      const x = (zone.x + 0.35) * TILE_SIZE;
+      const y = zone.y * TILE_SIZE + 3;
       const label = this.add.text(x, y, zone.label.toUpperCase(), {
         fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-        fontSize: '6px',
-        color: '#9ca3af',
+        fontSize: '7px',
+        color: '#c4c4cc',
       });
       label.setOrigin(0, 0);
       label.setDepth(3);
-      label.setAlpha(0.42);
+      label.setAlpha(0.72);
     }
   }
 }

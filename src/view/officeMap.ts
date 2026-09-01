@@ -11,6 +11,17 @@ export const MAP_ZOOM = 2;
 export const CANVAS_WIDTH = MAP_WIDTH * TILE_SIZE * MAP_ZOOM;
 export const CANVAS_HEIGHT = MAP_HEIGHT * TILE_SIZE * MAP_ZOOM;
 
+/**
+ * Composed camera shot: crop the outer wall field so desks and zones fill the stage.
+ * World size stays MAP_WIDTH × MAP_HEIGHT.
+ */
+export const OFFICE_VIEW = {
+  scrollX: TILE_SIZE,
+  scrollY: TILE_SIZE,
+  width: (MAP_WIDTH - 2) * TILE_SIZE,
+  height: (MAP_HEIGHT - 2) * TILE_SIZE,
+} as const;
+
 /** Índices no tileset room-builder (16x16, 16 colunas). */
 export const ROOM_TILE = {
   EMPTY: -1,
@@ -81,10 +92,10 @@ export interface OfficeZone {
 
 /** Visual zones only. Agents stay at WORKSTATIONS (not relocated by status). */
 export const OFFICE_ZONES: readonly OfficeZone[] = [
-  { id: 'work', label: 'Work', x: 2, y: 3, w: 16, h: 10 },
-  { id: 'meeting', label: 'Meeting', x: 19, y: 7, w: 7, h: 4 },
-  { id: 'lounge', label: 'Lounge', x: 2, y: 14, w: 16, h: 3 },
-  { id: 'support', label: 'Support', x: 19, y: 14, w: 7, h: 3 },
+  { id: 'meeting', label: 'Meeting', x: 18, y: 6, w: 9, h: 6 },
+  { id: 'lounge', label: 'Lounge', x: 1, y: 13, w: 17, h: 4 },
+  { id: 'support', label: 'Support', x: 18, y: 13, w: 9, h: 4 },
+  { id: 'work', label: 'Work', x: 1, y: 1, w: 26, h: 12 },
 ];
 
 export function zoneAtTile(x: number, y: number): OfficeZone | undefined {
@@ -99,9 +110,7 @@ export function tileToPixelCenter(tileX: number, tileY: number): { x: number; y:
 }
 
 export function isRoomWallCell(x: number, y: number): boolean {
-  const outer = x === 0 || x === MAP_WIDTH - 1 || y === 0 || y === MAP_HEIGHT - 1;
-  const northInner = y === 1 && x > 0 && x < MAP_WIDTH - 1;
-  return outer || northInner;
+  return x === 0 || x === MAP_WIDTH - 1 || y === 0 || y === MAP_HEIGHT - 1;
 }
 
 export function buildFloorLayer(): number[][] {

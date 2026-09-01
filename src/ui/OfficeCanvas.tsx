@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { useProjectedStore } from '../domain';
 import { resetAgentViewCache, selectAgentViews } from '../view/agentViewModel';
-import { MAP_HEIGHT, MAP_WIDTH, TILE_SIZE } from '../view/officeMap';
+import { OFFICE_VIEW } from '../view/officeMap';
 import { OfficeScene, OFFICE_READY_EVENT, OFFICE_SCENE_KEY } from '../scene/OfficeScene';
 import { useSelectionStore } from './selectionStore';
 
@@ -70,8 +70,8 @@ export function OfficeCanvas() {
     const game = new Phaser.Game({
       type: Phaser.AUTO,
       parent,
-      width: MAP_WIDTH * TILE_SIZE,
-      height: MAP_HEIGHT * TILE_SIZE,
+      width: OFFICE_VIEW.width,
+      height: OFFICE_VIEW.height,
       backgroundColor: '#121218',
       pixelArt: true,
       antialias: false,

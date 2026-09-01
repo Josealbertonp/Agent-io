@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useProjectedStore } from './domain';
 import { OfficeShell } from './ui/OfficeShell';
+import { ConnectionBanner } from './ui/ConnectionBanner';
 import { getActiveFeeder, startStoreFeeder, stopStoreFeeder } from './ui/feedProjectedStore';
 import { getFeedConfig } from './ui/feedConfig';
+import { useFeedTransport } from './ui/feedTransport';
 import { resetEventLog } from './ui/eventLog';
 import { resetSelectionStore } from './ui/selectionStore';
 import './App.css';
@@ -12,6 +14,7 @@ export function App() {
   const agentCount = useProjectedStore((s) => Object.keys(s.agents).length);
   const lastOccurredAt = useProjectedStore((s) => s.lastOccurredAt);
   const [feedMode] = useState(() => getFeedConfig().mode);
+  const transport = useFeedTransport();
 
   useEffect(() => {
     let cancelled = false;
@@ -47,11 +50,14 @@ export function App() {
       <header className="app-header">
         <div className="app-header__brand">
           <strong>Agent-IO</strong>
-          <span className={feedMode === 'sse' ? 'feed-pill feed-pill--live' : 'feed-pill feed-pill--demo'}>
-            {feedMode === 'sse' ? 'LIVE' : 'DEMO'}
-          </span>
+          <ConnectionBanner
+            connectionStatus={connectionStatus}
+            feedMode={feedMode}
+            transportStatus={transport.status}
+            transportDetail={transport.detail}
+          />
           <span className="app-meta">
-            {connectionStatus} · {agentCount} agentes
+            {agentCount} agents
             {lastOccurredAt ? ` · ${new Date(lastOccurredAt).toLocaleTimeString('pt-BR')}` : ''}
           </span>
         </div>

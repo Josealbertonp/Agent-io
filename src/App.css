@@ -19,7 +19,7 @@ body,
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 14px;
+  padding: 7px 14px;
   background: #14141a;
   border-bottom: 1px solid #23232c;
   font-size: 13px;
@@ -98,14 +98,14 @@ body,
 }
 
 .connection-banner {
-  grid-column: 1 / -1;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 4px 12px;
+  padding: 0;
   font-size: 11px;
-  border-bottom: 1px solid #2a2a33;
+  border: none;
+  background: transparent;
 }
 
 .status-chip {
@@ -125,28 +125,11 @@ body,
   font-weight: 400;
 }
 
-.connection-banner--live {
-  background: #10251a;
-  color: #bbf7d0;
-  border-bottom-color: #166534;
-}
-
-.connection-banner--demo {
-  background: #152033;
-  color: #bfdbfe;
-  border-bottom-color: #1d4ed8;
-}
-
-.connection-banner--warn {
-  background: #2a1d0a;
-  color: #fde68a;
-  border-bottom-color: #a16207;
-}
-
+.connection-banner--live,
+.connection-banner--demo,
+.connection-banner--warn,
 .connection-banner--bad {
-  background: #2a1212;
-  color: #fecaca;
-  border-bottom-color: #7f1d1d;
+  background: transparent;
 }
 
 .office-shell {
@@ -154,15 +137,10 @@ body,
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(220px, 260px);
-  grid-template-rows: auto minmax(0, 1fr) minmax(88px, 18vh);
+  grid-template-rows: minmax(0, 1fr) minmax(84px, 15vh);
   grid-template-areas:
-    "banner banner banner"
     "list stage panel"
     "timeline timeline timeline";
-}
-
-.office-shell > .connection-banner {
-  grid-area: banner;
 }
 
 .office-toolbar {
@@ -225,7 +203,9 @@ body,
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #1c1c24;
 }
 
 .event-timeline h2,
@@ -350,11 +330,11 @@ body,
 
 .agent-list__name {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .agent-list__status {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
@@ -377,13 +357,17 @@ body,
   line-height: 1.45;
 }
 
+.agent-panel {
+  height: 100%;
+}
+
 .panel-empty {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  min-height: 0;
+  justify-content: center;
+  min-height: 100%;
   text-align: left;
-  padding: 8px 2px;
+  padding: 16px 4px;
 }
 
 .panel-empty__kicker {
@@ -517,9 +501,8 @@ body,
 @media (max-width: 960px) {
   .office-shell {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr auto auto;
+    grid-template-rows: auto 1fr auto auto;
     grid-template-areas:
-      "banner"
       "toolbar"
       "stage"
       "list"

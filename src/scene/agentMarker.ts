@@ -28,19 +28,19 @@ export class AgentMarker {
     this.ring = scene.add.circle(0, 2, 12, 0x000000, 0);
     this.ring.setStrokeStyle(1, 0xf5d76e, 0);
 
-    this.sprite = scene.add.sprite(0, 0, characterAssetKey(view.characterIndex), 0);
-    this.sprite.setOrigin(0.5, 0.75);
-    this.sprite.setScale(0.72);
+    this.sprite = scene.add.sprite(0, 2, characterAssetKey(view.characterIndex), 0);
+    this.sprite.setOrigin(0.5, 0.88);
+    this.sprite.setScale(0.86);
 
-    this.statusDot = scene.add.circle(-8, 11, 1.6, view.statusVisual.color, 1);
+    this.statusDot = scene.add.circle(-10, 10, 1.8, view.statusVisual.color, 1);
 
-    this.nameText = scene.add.text(0, 13, '', {
+    this.nameText = scene.add.text(2, 11, '', {
       fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-      fontSize: '5px',
-      color: '#a1a1aa',
-      align: 'center',
+      fontSize: '6px',
+      color: '#d4d4d8',
+      align: 'left',
     });
-    this.nameText.setOrigin(0.5, 0);
+    this.nameText.setOrigin(0, 0);
 
     this.container = scene.add.container(view.x, view.y, [
       this.ring,
@@ -62,9 +62,9 @@ export class AgentMarker {
   setSelected(selected: boolean): void {
     this.selected = selected;
     this.ring.setStrokeStyle(1, 0xf5d76e, selected ? 0.9 : 0);
-    this.sprite.setScale(selected ? 0.8 : 0.72);
-    this.nameText.setColor(selected ? '#e4e4e7' : '#8b8b96');
-    this.nameText.setAlpha(selected ? 1 : 0.62);
+    this.sprite.setScale(selected ? 0.9 : 0.86);
+    this.nameText.setColor(selected ? '#f4f4f5' : '#c4c4cc');
+    this.nameText.setAlpha(selected ? 1 : 0.82);
   }
 
   isSelected(): boolean {
@@ -78,7 +78,7 @@ export class AgentMarker {
     this.sprite.setVisible(occupied);
     this.statusDot.setVisible(true);
     this.statusDot.setFillStyle(view.statusVisual.color, occupied ? 1 : 0.4);
-    this.nameText.setText(formatNameLine(view));
+    this.nameText.setText(`${formatNameLine(view)} · ${view.status}`);
     if (view.status === 'error') this.sprite.setTint(0xfca5a5);
     else if (view.status === 'blocked') this.sprite.setTint(0xa1a1aa);
     else this.sprite.clearTint();
