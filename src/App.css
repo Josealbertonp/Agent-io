@@ -58,11 +58,33 @@ body,
 
 .connection-banner {
   grid-column: 1 / -1;
-  background: #3f1d1d;
-  color: #fecaca;
   padding: 6px 12px;
   font-size: 12px;
-  border-bottom: 1px solid #7f1d1d;
+  border-bottom: 1px solid #3f3f4a;
+}
+
+.connection-banner--live {
+  background: #14532d;
+  color: #bbf7d0;
+  border-bottom-color: #166534;
+}
+
+.connection-banner--demo {
+  background: #1e3a5f;
+  color: #bfdbfe;
+  border-bottom-color: #1d4ed8;
+}
+
+.connection-banner--warn {
+  background: #713f12;
+  color: #fde68a;
+  border-bottom-color: #a16207;
+}
+
+.connection-banner--bad {
+  background: #3f1d1d;
+  color: #fecaca;
+  border-bottom-color: #7f1d1d;
 }
 
 .office-shell {

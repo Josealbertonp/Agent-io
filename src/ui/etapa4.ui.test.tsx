@@ -342,7 +342,9 @@ describe('Etapa 4 — interface operacional', () => {
     });
 
     const ok = await render(<ConnectionBanner connectionStatus="connected" />);
-    expect(ok.host.querySelector('[data-testid="connection-banner"]')).toBeNull();
+    expect(ok.host.querySelector('[data-testid="connection-banner"]')?.getAttribute('data-maestri')).toBe(
+      'connected'
+    );
     await act(async () => {
       ok.root.unmount();
     });

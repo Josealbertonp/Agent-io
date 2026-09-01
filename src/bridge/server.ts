@@ -40,12 +40,14 @@ export class BridgeServer {
   private poller: MaestriPoller | null = null;
   private clients: Set<ServerResponse> = new Set();
   private eventHistory: Event[] = [];
+  private readonly sourceKind: 'fake' | 'maestri';
 
   constructor(options: BridgeServerOptions = {}) {
     this.port = options.port ?? DEFAULT_SSE_PORT;
     this.source = options.source || createDefaultSource();
     this.checkpointPath = options.checkpointPath || DEFAULT_CHECKPOINT_PATH;
     this.pollIntervalMs = options.pollIntervalMs || 3000;
+    this.sourceKind = this.source instanceof FakeWorkspaceSource ? 'fake' : 'maestri';
   }
 
   public getListeningPort(): number {
@@ -127,7 +129,11 @@ export class BridgeServer {
       res.end(
         JSON.stringify({
           status: 'ok',
+          source: this.sourceKind,
           connectedClients: this.clients.size,
+          eventHistorySize: this.eventHistory.length,
+          lastPollError: this.poller?.getLastError() ?? null,
+          maestriConnection: this.poller?.getCheckpoint().lastSnapshot?.connectionStatus ?? null,
           checkpoint: this.poller?.getCheckpoint(),
         })
       );

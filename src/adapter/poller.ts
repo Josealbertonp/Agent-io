@@ -31,6 +31,7 @@ export class MaestriPoller {
   private readonly backoffFactor: number;
   private readonly jitterRatio: number;
   private currentIntervalMs: number;
+  private lastError: string | null = null;
   private consecutiveFailures: number = 0;
 
   private isRunning: boolean = false;
@@ -81,6 +82,10 @@ export class MaestriPoller {
 
   public getConsecutiveFailures(): number {
     return this.consecutiveFailures;
+  }
+
+  public getLastError(): string | null {
+    return this.lastError;
   }
 
   public start(): void {
@@ -179,9 +184,11 @@ export class MaestriPoller {
   private handleSuccess(): void {
     this.consecutiveFailures = 0;
     this.currentIntervalMs = this.minIntervalMs;
+    this.lastError = null;
   }
 
   private handleFailure(_error: unknown): void {
+    this.lastError = _error instanceof Error ? _error.message : String(_error);
     this.consecutiveFailures++;
     const rawInterval = this.minIntervalMs * Math.pow(this.backoffFactor, this.consecutiveFailures);
     const jitter = this.jitterRatio === 0 ? 0 : (Math.random() * 2 - 1) * this.jitterRatio * rawInterval;

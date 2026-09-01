@@ -4,11 +4,19 @@ import { Event, EventSchema } from '../contracts';
 export const DEFAULT_SSE_PORT = 3001;
 export const DEFAULT_SSE_URL = `http://localhost:${DEFAULT_SSE_PORT}/events`;
 
+export type SseTransportStatus =
+  | 'disconnected'
+  | 'connecting'
+  | 'connected'
+  | 'reconnecting'
+  | 'error';
+
 export interface SseClientOptions {
   /** Default: `http://localhost:3001/events` (mesma porta da bridge). */
   url?: string;
   onEvent: (event: Event) => void;
   onError?: (error: unknown) => void;
+  onStatus?: (status: SseTransportStatus, detail?: string) => void;
   /** Intervalo mínimo de reconnect (ms). Default 1000. */
   reconnectIntervalMs?: number;
   maxReconnectIntervalMs?: number;
@@ -68,6 +76,8 @@ export class SseEventClient {
   public readonly url: string;
   private readonly onEvent: (event: Event) => void;
   private readonly onError?: (error: unknown) => void;
+  private readonly onStatus?: (status: SseTransportStatus, detail?: string) => void;
+  private transportStatus: SseTransportStatus = 'disconnected';
   private readonly minReconnectIntervalMs: number;
   private readonly maxReconnectIntervalMs: number;
   private readonly reconnectBackoffFactor: number;
@@ -86,6 +96,7 @@ export class SseEventClient {
     this.url = options.url ?? DEFAULT_SSE_URL;
     this.onEvent = options.onEvent;
     this.onError = options.onError;
+    this.onStatus = options.onStatus;
     this.minReconnectIntervalMs = options.reconnectIntervalMs ?? 1000;
     this.maxReconnectIntervalMs = options.maxReconnectIntervalMs ?? 15000;
     this.reconnectBackoffFactor = options.reconnectBackoffFactor ?? 2;
@@ -111,10 +122,15 @@ export class SseEventClient {
     return this.consecutiveFailures;
   }
 
+  public getTransportStatus(): SseTransportStatus {
+    return this.transportStatus;
+  }
+
   public connect(): void {
     if (this.loopRunning) return;
     this.isClosed = false;
     this.loopRunning = true;
+    this.setTransportStatus('connecting');
     void this.runLoop();
   }
 
@@ -122,6 +138,7 @@ export class SseEventClient {
     this.isClosed = true;
     this.abortController?.abort();
     this.abortController = null;
+    this.setTransportStatus('disconnected');
   }
 
   public handleMessage(rawChunk: string): void {
@@ -144,11 +161,16 @@ export class SseEventClient {
         this.consecutiveFailures = 0;
         this.currentReconnectIntervalMs = this.minReconnectIntervalMs;
         if (this.isClosed) break;
+        this.setTransportStatus('reconnecting', 'stream encerrado');
         await this.sleep(this.minReconnectIntervalMs);
       } catch (err) {
         if (this.isClosed) break;
         this.onError?.(err);
         this.consecutiveFailures++;
+        this.setTransportStatus(
+          this.consecutiveFailures === 1 ? 'error' : 'reconnecting',
+          err instanceof Error ? err.message : String(err)
+        );
         this.currentReconnectIntervalMs = computeReconnectBackoffMs(
           this.consecutiveFailures,
           this.minReconnectIntervalMs,
@@ -180,6 +202,8 @@ export class SseEventClient {
       throw new Error(`SSE connection failed: ${res.status}`);
     }
 
+    this.setTransportStatus('connected');
+
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
@@ -202,6 +226,11 @@ export class SseEventClient {
         // stream já encerrado
       }
     }
+  }
+
+  private setTransportStatus(status: SseTransportStatus, detail?: string): void {
+    this.transportStatus = status;
+    this.onStatus?.(status, detail);
   }
 
   private async sleep(ms: number): Promise<void> {
