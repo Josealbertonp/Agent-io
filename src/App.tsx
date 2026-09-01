@@ -70,8 +70,7 @@ export function App() {
         <OfficeShell />
       </main>
       <footer className="app-credit">
-        Tiles: Modern Office by LimeZu — créditos apreciados. Agentes: placeholder (pacote sem
-        sprites de personagem).
+        Tiles e personagens: LimeZu Modern Office + Modern Interiors — créditos obrigatórios.
       </footer>
     </div>
   );

@@ -46,7 +46,7 @@ export const WORKSTATIONS: readonly Workstation[] = [
 ];
 
 export interface FurnitureProp {
-  key: 'desk' | 'chair' | 'plant' | 'vending' | 'bookshelf';
+  key: 'desk' | 'chair' | 'plant' | 'vending' | 'bookshelf' | 'conferenceTable' | 'loungeSofa';
   tileX: number;
   tileY: number;
 }
@@ -57,10 +57,39 @@ export const FURNITURE: readonly FurnitureProp[] = [
     { key: 'chair' as const, tileX: s.tileX, tileY: s.tileY + 1 },
   ]),
   { key: 'plant', tileX: 9, tileY: 3 },
+  { key: 'plant', tileX: 3, tileY: 14 },
+  { key: 'plant', tileX: 8, tileY: 15 },
   { key: 'plant', tileX: 18, tileY: 14 },
   { key: 'bookshelf', tileX: 9, tileY: 4 },
+  { key: 'chair', tileX: 20, tileY: 8 },
+  { key: 'chair', tileX: 22, tileY: 8 },
+  { key: 'conferenceTable', tileX: 21, tileY: 7 },
+  { key: 'loungeSofa', tileX: 5, tileY: 14 },
   { key: 'vending', tileX: 24, tileY: 14 },
 ];
+
+export type OfficeZoneId = 'work' | 'meeting' | 'lounge' | 'support';
+
+export interface OfficeZone {
+  id: OfficeZoneId;
+  label: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Visual zones only. Agents stay at WORKSTATIONS (not relocated by status). */
+export const OFFICE_ZONES: readonly OfficeZone[] = [
+  { id: 'work', label: 'Work', x: 2, y: 3, w: 16, h: 10 },
+  { id: 'meeting', label: 'Meeting', x: 19, y: 7, w: 7, h: 4 },
+  { id: 'lounge', label: 'Lounge', x: 2, y: 14, w: 16, h: 3 },
+  { id: 'support', label: 'Support', x: 19, y: 14, w: 7, h: 3 },
+];
+
+export function zoneAtTile(x: number, y: number): OfficeZone | undefined {
+  return OFFICE_ZONES.find((z) => x >= z.x && x < z.x + z.w && y >= z.y && y < z.y + z.h);
+}
 
 export function tileToPixelCenter(tileX: number, tileY: number): { x: number; y: number } {
   return {
@@ -82,10 +111,12 @@ export function buildFloorLayer(): number[][] {
     for (let x = 0; x < MAP_WIDTH; x++) {
       if (isRoomWallCell(x, y)) {
         row.push(ROOM_TILE.EMPTY);
-      } else if (y >= 14 && x >= 20) {
-        row.push(ROOM_TILE.FLOOR_LOUNGE);
       } else {
-        row.push((x + y) % 2 === 0 ? ROOM_TILE.FLOOR : ROOM_TILE.FLOOR_ALT);
+        const zone = zoneAtTile(x, y)?.id;
+        if (zone === 'lounge') row.push(ROOM_TILE.FLOOR_LOUNGE);
+        else if (zone === 'support') row.push(ROOM_TILE.FLOOR_DARK);
+        else if (zone === 'meeting') row.push(ROOM_TILE.FLOOR_ALT);
+        else row.push((x + y) % 2 === 0 ? ROOM_TILE.FLOOR : ROOM_TILE.FLOOR_ALT);
       }
     }
     data.push(row);

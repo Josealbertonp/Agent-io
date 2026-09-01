@@ -7,6 +7,8 @@ export const OFFICE_ASSET_URLS = {
   plant: '/office/plant.png',
   vending: '/office/vending.png',
   bookshelf: '/office/bookshelf.png',
+  conferenceTable: '/office/conference-table.png',
+  loungeSofa: '/office/lounge-sofa.png',
 } as const;
 
 export const OFFICE_ASSET_KEYS = {
@@ -17,4 +19,6 @@ export const OFFICE_ASSET_KEYS = {
   plant: 'office-plant',
   vending: 'office-vending',
   bookshelf: 'office-bookshelf',
+  conferenceTable: 'office-conference-table',
+  loungeSofa: 'office-lounge-sofa',
 } as const;

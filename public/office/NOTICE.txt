@@ -11,3 +11,16 @@ License (from LICENSE.txt, included alongside these copies):
 - Credits are appreciated.
 
 Credits: Modern Office by LimeZu.
+
+---
+
+Modern Interiors (full version) — characters and selected furniture singles
+Author: LimeZu
+License: LICENSE-INTERIORS.txt (credits required; pack must not be redistributed).
+
+This app copies only:
+- six Character Generator premade 32×32 sheets (`characters/agent-0.png` … `agent-5.png`)
+- Conference_Hall_Singles_1.png → conference-table.png
+- Living_Room_Singles_1.png → lounge-sofa.png
+
+The purchased Interiors pack at the repository root is not versioned.
