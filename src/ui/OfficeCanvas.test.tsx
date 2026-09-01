@@ -39,7 +39,7 @@ vi.mock('phaser', () => {
   return {
     default: {
       AUTO: 0,
-      Scale: { FIT: 1, CENTER_BOTH: 2 },
+      Scale: { FIT: 1, CENTER_BOTH: 2, ENVELOP: 3 },
       Game,
       Scene,
     },

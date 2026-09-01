@@ -17,9 +17,9 @@ export const CANVAS_HEIGHT = MAP_HEIGHT * TILE_SIZE * MAP_ZOOM;
  */
 export const OFFICE_VIEW = {
   scrollX: TILE_SIZE,
-  scrollY: TILE_SIZE,
+  scrollY: TILE_SIZE * 2,
   width: (MAP_WIDTH - 2) * TILE_SIZE,
-  height: (MAP_HEIGHT - 2) * TILE_SIZE,
+  height: (MAP_HEIGHT - 3) * TILE_SIZE,
 } as const;
 
 /** Índices no tileset room-builder (16x16, 16 colunas). */

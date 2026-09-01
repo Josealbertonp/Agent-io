@@ -57,7 +57,8 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
 
   create(): void {
     this.cameras.main.setBackgroundColor('#16161c');
-    this.cameras.main.setScroll(OFFICE_VIEW.scrollX, OFFICE_VIEW.scrollY);
+    this.applyOfficeCamera();
+    this.scale.on('resize', () => this.applyOfficeCamera());
     this.registerCharacterAnims();
     this.paintRoomBase();
     this.buildTileLayers();
@@ -205,6 +206,10 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
         });
       }
     }
+  }
+
+  private applyOfficeCamera(): void {
+    this.cameras.main.setScroll(OFFICE_VIEW.scrollX, OFFICE_VIEW.scrollY);
   }
 
   private paintRoomBase(): void {
