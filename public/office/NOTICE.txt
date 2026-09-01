@@ -1,0 +1,13 @@
+Modern Office tileset
+Author: LimeZu
+Source: https://limezu.itch.io/moderninteriors
+
+This project USES the Modern Office asset inside the Agent-IO application.
+It does not resell or redistribute the pack as a standalone asset.
+
+License (from LICENSE.txt, included alongside these copies):
+- You CAN edit and use the asset in any commercial or non-commercial project.
+- You CAN'T resell or distribute the asset to others, nor edit and resell it.
+- Credits are appreciated.
+
+Credits: Modern Office by LimeZu.

@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Maestri local workspace (roles, canvas)
+.maestri/
+
+# LimeZu raw Modern Office pack (app uses copies in public/office/)
+1_Room_Builder_Office/
+2_Modern_Office_Black_Shadow/
+3_Modern_Office_Shadowless/
+4_Modern_Office_singles/
+5_Modern_Office_RPG_MAKER_MV/
+6_Office_Designs/
+7_Modern_Office_Previous_Version/
+/Modern_Office_16x16.png
+/Modern_Office_32x32.png
+/Modern_Office_48x48.png
+
+# Editor directories and files
+.agent-io/
+.agent-io
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

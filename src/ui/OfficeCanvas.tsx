@@ -1,0 +1,120 @@
+import { useEffect, useRef } from 'react';
+import Phaser from 'phaser';
+import { useProjectedStore } from '../domain';
+import { resetAgentViewCache, selectAgentViews } from '../view/agentViewModel';
+import { CANVAS_HEIGHT, MAP_HEIGHT, MAP_WIDTH, MAP_ZOOM, TILE_SIZE } from '../view/officeMap';
+import { OfficeScene, OFFICE_READY_EVENT, OFFICE_SCENE_KEY } from '../scene/OfficeScene';
+import { useSelectionStore } from './selectionStore';
+
+export interface PhaserSceneHost {
+  scene: { getScene(key: string): unknown };
+}
+
+export type OfficeSceneHandle = {
+  applyViews?: OfficeScene['applyViews'];
+  setSelected?: OfficeScene['setSelected'];
+  setOnAgentClick?: OfficeScene['setOnAgentClick'];
+  isOfficeReady?: () => boolean;
+  events?: { once: (event: string, fn: () => void) => void };
+};
+
+export function getOfficeScene(game: PhaserSceneHost): OfficeSceneHandle | undefined {
+  return game.scene.getScene(OFFICE_SCENE_KEY) as OfficeSceneHandle | undefined;
+}
+
+export function pushViewsToScene(game: PhaserSceneHost): void {
+  const scene = getOfficeScene(game);
+  if (!scene?.applyViews) return;
+  scene.applyViews(selectAgentViews(useProjectedStore.getState().agents));
+}
+
+export function pushSelectionToScene(game: PhaserSceneHost, selectedId: string | null): void {
+  const scene = getOfficeScene(game);
+  scene?.setSelected?.(selectedId);
+}
+
+export function bindSceneAgentClick(game: PhaserSceneHost, onSelect: (id: string) => void): void {
+  const scene = getOfficeScene(game);
+  scene?.setOnAgentClick?.(onSelect);
+}
+
+function attachSceneSync(game: Phaser.Game): void {
+  const scene = getOfficeScene(game);
+  if (!scene) return;
+  scene.events?.once(OFFICE_READY_EVENT, () => {
+    pushViewsToScene(game);
+    pushSelectionToScene(game, useSelectionStore.getState().selectedAgentId);
+    bindSceneAgentClick(game, (id) => useSelectionStore.getState().select(id));
+  });
+  if (scene.isOfficeReady?.()) {
+    pushViewsToScene(game);
+    pushSelectionToScene(game, useSelectionStore.getState().selectedAgentId);
+    bindSceneAgentClick(game, (id) => useSelectionStore.getState().select(id));
+  }
+}
+
+/**
+ * React dono do ciclo de vida; Phaser dono da cena 2D.
+ * Assina o ProjectedStore (views) e o selectionStore (highlight). Sem estado canônico na cena.
+ */
+export function OfficeCanvas() {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const gameRef = useRef<Phaser.Game | null>(null);
+
+  useEffect(() => {
+    const parent = hostRef.current;
+    if (!parent) return;
+
+    const game = new Phaser.Game({
+      type: Phaser.AUTO,
+      parent,
+      width: MAP_WIDTH * TILE_SIZE,
+      height: MAP_HEIGHT * TILE_SIZE,
+      backgroundColor: '#1a1a22',
+      pixelArt: true,
+      antialias: false,
+      scene: [OfficeScene],
+      scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        zoom: MAP_ZOOM,
+      },
+      callbacks: {
+        postBoot: (booted) => attachSceneSync(booted),
+      },
+    });
+    gameRef.current = game;
+
+    const unsubAgents = useProjectedStore.subscribe((state, previous) => {
+      if (state.agents === previous.agents) return;
+      pushViewsToScene(game);
+    });
+
+    const unsubSelection = useSelectionStore.subscribe((state, previous) => {
+      if (state.selectedAgentId === previous.selectedAgentId) return;
+      pushSelectionToScene(game, state.selectedAgentId);
+    });
+
+    const onResize = () => {
+      game.scale.refresh();
+    };
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      unsubAgents();
+      unsubSelection();
+      resetAgentViewCache();
+      game.destroy(true);
+      gameRef.current = null;
+    };
+  }, []);
+
+  return (
+    <div
+      ref={hostRef}
+      data-testid="office-canvas"
+      style={{ width: '100%', height: '100%', minHeight: CANVAS_HEIGHT, overflow: 'hidden' }}
+    />
+  );
+}
