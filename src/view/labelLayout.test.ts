@@ -30,20 +30,19 @@ describe('labelLayout — demo sem colisão', () => {
     expect(ellipsis('Implementador', 11)).toBe('Implementa…');
   });
 
-  it('os 6 agentes do demo não têm caixas de rótulo intersectando (zoom padrão / mundo)', () => {
+  it('demo agents have no intersecting name labels', () => {
     const views = buildAgentViews(asAgents());
     expect(views).toHaveLength(6);
     expect(overlappingLabelPairs(views)).toEqual([]);
   });
 
-  it('caixas do mesmo agente (nome vs meta) também não se cruzam', () => {
+  it('name labels sit above the marker without a meta block', () => {
     const views = buildAgentViews(asAgents());
     for (const view of views) {
       const nameBottom = view.y + LABEL.nameOffsetY;
       const nameTop = nameBottom - LABEL.nameHeight;
-      const metaTop = view.y + view.metaOffsetY;
-      expect(nameBottom).toBeLessThanOrEqual(metaTop);
       expect(nameTop).toBeLessThan(nameBottom);
+      expect(nameBottom).toBeLessThan(view.y);
     }
   });
 

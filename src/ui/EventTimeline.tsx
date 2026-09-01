@@ -66,7 +66,9 @@ export function EventTimeline({ events, agents, statusFilter }: EventTimelinePro
   if (events.length === 0) {
     return (
       <section className="event-timeline" data-testid="event-timeline">
-        <h2>Timeline</h2>
+        <header className="event-timeline__head">
+          <h2>Timeline</h2>
+        </header>
         <p className="empty-state" data-testid="empty-timeline">
           Nenhum evento ainda.
         </p>
@@ -76,7 +78,10 @@ export function EventTimeline({ events, agents, statusFilter }: EventTimelinePro
 
   return (
     <section className="event-timeline" data-testid="event-timeline">
-      <h2>Timeline</h2>
+      <header className="event-timeline__head">
+        <h2>Timeline</h2>
+        <span className="event-timeline__hint">fluxo de atividade</span>
+      </header>
       <ol className="event-timeline__list">
         {visible.map((event) => {
           const status = relatedStatus(event);

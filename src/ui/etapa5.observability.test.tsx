@@ -220,7 +220,8 @@ describe('Etapa 5 — observabilidade em tempo real', () => {
     const demo = await render(
       <ConnectionBanner connectionStatus="connected" feedMode="fake" transportStatus="connected" />
     );
-    expect(demo.host.textContent).toMatch(/Demo \(fake\)/);
+    expect(demo.host.textContent).toMatch(/DEMO/);
+    expect(demo.host.textContent).toMatch(/dados locais/);
     await act(async () => {
       demo.root.unmount();
     });
@@ -228,6 +229,7 @@ describe('Etapa 5 — observabilidade em tempo real', () => {
     const live = await render(
       <ConnectionBanner connectionStatus="connected" feedMode="sse" transportStatus="connected" />
     );
+    expect(live.host.textContent).toMatch(/LIVE/);
     expect(live.host.textContent).toMatch(/Ao vivo/);
     await act(async () => {
       live.root.unmount();

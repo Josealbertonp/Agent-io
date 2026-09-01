@@ -5,18 +5,18 @@ import type { AgentView } from './agentViewModel';
  * Phaser e os testes de colisão usam os mesmos números.
  */
 export const LABEL = {
-  maxWidth: 48,
-  padX: 2,
-  padY: 1,
+  maxWidth: 44,
+  padX: 1,
+  padY: 0,
   nameFontPx: 7,
   metaFontPx: 6,
-  nameMaxChars: 11,
+  nameMaxChars: 12,
   statusMaxChars: 12,
   roleMaxChars: 13,
   badgeMaxChars: 13,
-  nameOffsetY: -13,
+  nameOffsetY: -12,
   metaOffsetY: 9,
-  nameHeight: 11,
+  nameHeight: 10,
   metaLineHeight: 8,
   metaLines: 3,
   staggerDy: 12,
@@ -128,13 +128,7 @@ export function resolveMetaOffsets(views: readonly Pick<AgentView, 'id' | 'x' | 
 }
 
 export function agentLabelBoxes(views: readonly Pick<AgentView, 'id' | 'x' | 'y'>[]): LabelBox[] {
-  const offsets = resolveMetaOffsets(views);
-  const boxes: LabelBox[] = [];
-  for (const view of views) {
-    boxes.push(nameBox(view.id, view.x, view.y));
-    boxes.push(metaBox(view.id, view.x, view.y, offsets.get(view.id) ?? LABEL.metaOffsetY));
-  }
-  return boxes;
+  return views.map((view) => nameBox(view.id, view.x, view.y));
 }
 
 export function overlappingLabelPairs(views: readonly Pick<AgentView, 'id' | 'x' | 'y'>[]): [LabelBox, LabelBox][] {

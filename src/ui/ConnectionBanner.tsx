@@ -65,7 +65,7 @@ export function ConnectionBanner({
   const isLive = feedMode === 'sse';
   const summary = isLive
     ? `Ao vivo · ${transportLabel(transportStatus)} · ${maestriLabel(connectionStatus)}`
-    : `Demo (fake) · dados locais, não é o Maestri ao vivo · ${maestriLabel(connectionStatus)}`;
+    : `dados locais, não é o Maestri ao vivo · ${maestriLabel(connectionStatus)}`;
   const detail = isLive && transportDetail ? ` — ${transportDetail}` : '';
 
   return (
@@ -77,8 +77,13 @@ export function ConnectionBanner({
       data-maestri={connectionStatus}
       role="status"
     >
-      {summary}
-      {detail}
+      <span className={isLive ? 'feed-pill feed-pill--live' : 'feed-pill feed-pill--demo'}>
+        {isLive ? 'LIVE' : 'DEMO'}
+      </span>
+      <span className="connection-banner__text">
+        {summary}
+        {detail}
+      </span>
     </div>
   );
 }

@@ -51,13 +51,14 @@ export function AgentList({ agents, statusFilter }: AgentListProps) {
               data-testid={`agent-list-item-${agent.id}`}
               aria-pressed={selected}
               onClick={() => select(agent.id)}
+              style={{ borderLeftColor: visual.hex }}
             >
-              <span className="agent-list__name">{agent.name}</span>
-              <span className="agent-list__status" style={{ color: visual.hex }}>
-                <span className="status-dot" style={{ background: visual.hex }} aria-hidden>
-                  {visual.icon}
+              <span className="agent-list__row">
+                <span className="agent-list__name">{agent.name}</span>
+                <span className="agent-list__status" style={{ color: visual.hex }}>
+                  <span className="status-dot status-dot--sm" style={{ background: visual.hex }} aria-hidden />
+                  {visual.label}
                 </span>
-                {visual.label}
               </span>
               <span className="agent-list__meta">{agent.role}</span>
               <span className="agent-list__meta">

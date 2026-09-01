@@ -85,7 +85,7 @@ export function buildFloorLayer(): number[][] {
       } else if (y >= 14 && x >= 20) {
         row.push(ROOM_TILE.FLOOR_LOUNGE);
       } else {
-        row.push(ROOM_TILE.FLOOR);
+        row.push((x + y) % 2 === 0 ? ROOM_TILE.FLOOR : ROOM_TILE.FLOOR_ALT);
       }
     }
     data.push(row);
