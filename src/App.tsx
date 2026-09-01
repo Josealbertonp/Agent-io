@@ -13,8 +13,15 @@ export function App() {
   const [feedMode] = useState(() => getFeedConfig().mode);
 
   useEffect(() => {
-    startStoreFeeder();
-    return () => stopStoreFeeder();
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      startStoreFeeder();
+    });
+    return () => {
+      cancelled = true;
+      stopStoreFeeder();
+    };
   }, []);
 
   useEffect(() => {

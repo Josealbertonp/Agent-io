@@ -5,6 +5,8 @@ import { AgentPanel } from './AgentPanel';
 import { ConnectionBanner } from './ConnectionBanner';
 import { EventTimeline } from './EventTimeline';
 import { usePresentationEventLog } from './eventLog';
+import { getFeedConfig } from './feedConfig';
+import { useFeedTransport } from './feedTransport';
 import { OfficeCanvas } from './OfficeCanvas';
 import { useSelectionStore } from './selectionStore';
 import { StatusFilter } from './StatusFilter';
@@ -18,6 +20,8 @@ export function OfficeShell() {
   const agents = useProjectedStore((s) => s.agents);
   const connectionStatus = useProjectedStore((s) => s.connectionStatus);
   const events = usePresentationEventLog();
+  const feedMode = getFeedConfig().mode;
+  const transport = useFeedTransport();
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('all');
   const [listOpen, setListOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -37,7 +41,12 @@ export function OfficeShell() {
 
   return (
     <div className="office-shell">
-      <ConnectionBanner connectionStatus={connectionStatus} />
+      <ConnectionBanner
+        connectionStatus={connectionStatus}
+        feedMode={feedMode}
+        transportStatus={transport.status}
+        transportDetail={transport.detail}
+      />
       <div className="office-toolbar">
         <button type="button" className="office-toolbar__btn" onClick={() => setListOpen((v) => !v)}>
           Lista

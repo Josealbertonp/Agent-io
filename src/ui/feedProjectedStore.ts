@@ -10,6 +10,7 @@ import {
 } from '../view/demoWorkspace';
 import { appendPresentationEvents, resetEventLog } from './eventLog';
 import { FeedConfig, getFeedConfig } from './feedConfig';
+import { resetFeedTransport, setFeedTransport } from './feedTransport';
 import { resetSelectionStore, useSelectionStore } from './selectionStore';
 
 /**
@@ -95,10 +96,14 @@ class SseStoreFeeder implements StoreFeeder {
 
   start(): void {
     if (this.client) return;
+    setFeedTransport('connecting');
     this.client = new SseEventClient({
       url: this.url,
       onEvent: (event) => {
         ingestAndRecord(event);
+      },
+      onStatus: (status, detail) => {
+        setFeedTransport(status, detail);
       },
     });
     this.client.connect();
@@ -107,6 +112,7 @@ class SseStoreFeeder implements StoreFeeder {
   stop(): void {
     this.client?.close();
     this.client = null;
+    setFeedTransport('disconnected');
   }
 
   simulateStatusChange(): void {
@@ -128,6 +134,10 @@ export function startStoreFeeder(config: FeedConfig = getFeedConfig()): StoreFee
   stopStoreFeeder();
   resetEventLog();
   resetSelectionStore();
+  resetFeedTransport();
+  if (config.mode === 'fake') {
+    setFeedTransport('connected', 'modo demo local');
+  }
   activeFeeder =
     config.mode === 'sse' ? new SseStoreFeeder(config.sseUrl) : new FakeStoreFeeder();
   activeFeeder.start();

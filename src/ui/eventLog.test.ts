@@ -43,6 +43,14 @@ describe('eventLog de apresentação', () => {
     expect(stored.at(-1)?.eventId).toBe(`e-${PRESENTATION_EVENT_LOG_CAP + 4}`);
   });
 
+  it('deduplica por eventId (replay SSE não duplica linha)', () => {
+    const once = evt({ eventId: 'dup-1', type: 'agent.connected' });
+    appendPresentationEvents([once, once]);
+    appendPresentationEvents([once]);
+    expect(getPresentationEvents()).toHaveLength(1);
+    expect(getPresentationEvents()[0].eventId).toBe('dup-1');
+  });
+
   it('extras vêm do payload mais recente — sem inventar', () => {
     appendPresentationEvents([
       evt({

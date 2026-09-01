@@ -130,6 +130,12 @@ describe('Bridge SSE (Etapa 2.1)', () => {
       if (emitted.length > 1) {
         expect(resumeBody).toContain(`id: ${emitted[1].eventId}`);
       }
+
+      const statusRes = await fetch(`http://127.0.0.1:${port}/status`);
+      const statusJson = (await statusRes.json()) as { source: string; status: string };
+      expect(statusRes.status).toBe(200);
+      expect(statusJson.status).toBe('ok');
+      expect(statusJson.source).toBe('fake');
     });
   });
 
@@ -155,6 +161,7 @@ describe('Bridge SSE (Etapa 2.1)', () => {
       expect(eventsReceived).toHaveLength(1);
       expect(eventsReceived[0].eventId).toBe('evt-456');
       expect(client.getLastEventId()).toBe('evt-456');
+      expect(client.getTransportStatus()).toBe('disconnected');
       client.close();
       expect(client.isOpen).toBe(false);
     });

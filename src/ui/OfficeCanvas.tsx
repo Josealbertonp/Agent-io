@@ -65,6 +65,8 @@ export function OfficeCanvas() {
     const parent = hostRef.current;
     if (!parent) return;
 
+    let cancelled = false;
+
     const game = new Phaser.Game({
       type: Phaser.AUTO,
       parent,
@@ -80,17 +82,22 @@ export function OfficeCanvas() {
         zoom: MAP_ZOOM,
       },
       callbacks: {
-        postBoot: (booted) => attachSceneSync(booted),
+        postBoot: (booted) => {
+          if (cancelled) return;
+          attachSceneSync(booted);
+        },
       },
     });
     gameRef.current = game;
 
     const unsubAgents = useProjectedStore.subscribe((state, previous) => {
+      if (cancelled) return;
       if (state.agents === previous.agents) return;
       pushViewsToScene(game);
     });
 
     const unsubSelection = useSelectionStore.subscribe((state, previous) => {
+      if (cancelled) return;
       if (state.selectedAgentId === previous.selectedAgentId) return;
       pushSelectionToScene(game, state.selectedAgentId);
     });
@@ -101,6 +108,7 @@ export function OfficeCanvas() {
     window.addEventListener('resize', onResize);
 
     return () => {
+      cancelled = true;
       window.removeEventListener('resize', onResize);
       unsubAgents();
       unsubSelection();

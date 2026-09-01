@@ -13,6 +13,7 @@ import { Event } from '../contracts';
 export const PRESENTATION_EVENT_LOG_CAP = 200;
 
 let events: Event[] = [];
+const seenEventIds = new Set<string>();
 const listeners = new Set<() => void>();
 
 function emit(): void {
@@ -23,7 +24,14 @@ function emit(): void {
 
 export function appendPresentationEvents(incoming: readonly Event[]): void {
   if (incoming.length === 0) return;
-  events = events.concat(incoming);
+  const novel: Event[] = [];
+  for (const event of incoming) {
+    if (seenEventIds.has(event.eventId)) continue;
+    seenEventIds.add(event.eventId);
+    novel.push(event);
+  }
+  if (novel.length === 0) return;
+  events = events.concat(novel);
   if (events.length > PRESENTATION_EVENT_LOG_CAP) {
     events = events.slice(events.length - PRESENTATION_EVENT_LOG_CAP);
   }
@@ -35,8 +43,9 @@ export function getPresentationEvents(): readonly Event[] {
 }
 
 export function resetEventLog(): void {
-  if (events.length === 0) return;
+  if (events.length === 0 && seenEventIds.size === 0) return;
   events = [];
+  seenEventIds.clear();
   emit();
 }
 
