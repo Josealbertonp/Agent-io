@@ -120,6 +120,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     if (floorTiles) {
       const floor = floorMap.createLayer(0, floorTiles, 0, 0);
       floor?.setDepth(0);
+      floor?.setAlpha(0.38);
     }
 
     const wallMap = this.make.tilemap({

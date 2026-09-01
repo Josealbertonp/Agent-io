@@ -10,6 +10,7 @@ import './App.css';
 export function App() {
   const connectionStatus = useProjectedStore((s) => s.connectionStatus);
   const agentCount = useProjectedStore((s) => Object.keys(s.agents).length);
+  const lastOccurredAt = useProjectedStore((s) => s.lastOccurredAt);
   const [feedMode] = useState(() => getFeedConfig().mode);
 
   useEffect(() => {
@@ -44,10 +45,14 @@ export function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <div>
+        <div className="app-header__brand">
           <strong>Agent-IO</strong>
+          <span className={feedMode === 'sse' ? 'feed-pill feed-pill--live' : 'feed-pill feed-pill--demo'}>
+            {feedMode === 'sse' ? 'LIVE' : 'DEMO'}
+          </span>
           <span className="app-meta">
-            {feedMode} · {connectionStatus} · {agentCount} agentes
+            {connectionStatus} · {agentCount} agentes
+            {lastOccurredAt ? ` · ${new Date(lastOccurredAt).toLocaleTimeString('pt-BR')}` : ''}
           </span>
         </div>
         <div className="app-actions">

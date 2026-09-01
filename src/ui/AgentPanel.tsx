@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Agent, ConnectionStatus, Event } from '../contracts';
 import { statusVisualFor } from '../view/statusVisual';
 import { selectAgentViews } from '../view/agentViewModel';
@@ -32,9 +33,12 @@ export function AgentPanel({ agents, connectionStatus, events }: AgentPanelProps
             </button>
           </p>
         ) : (
-          <p className="empty-state" data-testid="panel-empty">
-            Selecione um agente no escritório ou na lista.
-          </p>
+          <div className="panel-empty" data-testid="panel-empty">
+            <span className="panel-empty__icon" aria-hidden>
+              ◇
+            </span>
+            <p className="empty-state">Selecione um agente no escritório ou na lista.</p>
+          </div>
         )}
       </aside>
     );
@@ -47,38 +51,37 @@ export function AgentPanel({ agents, connectionStatus, events }: AgentPanelProps
   return (
     <aside className="agent-panel" data-testid="agent-panel">
       <header className="agent-panel__head">
-        <h2>{agent.name}</h2>
+        <div>
+          <p className="agent-panel__kicker">Agente</p>
+          <h2>{agent.name}</h2>
+        </div>
         <button type="button" className="agent-panel__close" onClick={() => clear('manual')}>
           Fechar
         </button>
       </header>
-      <dl className="agent-panel__fields">
+
+      <div className="agent-panel__status" style={{ borderColor: visual.hex }}>
+        <span className="status-dot" style={{ background: visual.hex }} aria-hidden>
+          {visual.icon}
+        </span>
+        <span data-testid="panel-status" style={{ color: visual.hex }}>
+          {visual.label}
+        </span>
+      </div>
+
+      <Section title="Identidade">
         <Row label="Role" value={agent.role} />
         <Row label="Provider" value={displayProviderOrModel(agent.provider)} testId="panel-provider" />
         <Row label="Model" value={displayProviderOrModel(agent.model)} testId="panel-model" />
-        <div className="agent-panel__row">
-          <dt>Status</dt>
-          <dd data-testid="panel-status" style={{ color: visual.hex }}>
-            <span className="status-dot" style={{ background: visual.hex }} aria-hidden>
-              {visual.icon}
-            </span>
-            {visual.label}
-          </dd>
-        </div>
+      </Section>
+
+      <Section title="Atividade">
         <Row
           label="Atividade"
           value={displayOptional(extras.currentActivity)}
           testId="panel-activity"
         />
         <Row label="Última atividade" value={formatOccurredAt(agent.lastActivityAt)} />
-        <Row
-          label="Posição"
-          value={`${agent.position.x}, ${agent.position.y}${
-            view?.usedFallbackLayout ? ' (layout fallback)' : ''
-          }`}
-          testId="panel-position"
-        />
-        <Row label="Conexão" value={connectionStatus} testId="panel-connection" />
         <Row
           label="Confiança"
           value={displayOptional(extras.statusConfidence)}
@@ -89,8 +92,31 @@ export function AgentPanel({ agents, connectionStatus, events }: AgentPanelProps
           value={displayOptional(extras.statusEvidence)}
           testId="panel-evidence"
         />
-      </dl>
+      </Section>
+
+      <Section title="Posição">
+        <Row
+          label="Posição"
+          value={`${agent.position.x}, ${agent.position.y}${
+            view?.usedFallbackLayout ? ' (layout fallback)' : ''
+          }`}
+          testId="panel-position"
+        />
+      </Section>
+
+      <Section title="Conexão">
+        <Row label="Conexão" value={connectionStatus} testId="panel-connection" />
+      </Section>
     </aside>
+  );
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="agent-panel__section">
+      <h3 className="agent-panel__section-title">{title}</h3>
+      <dl className="agent-panel__fields">{children}</dl>
+    </section>
   );
 }
 
