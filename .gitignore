@@ -27,6 +27,24 @@ dist-ssr
 /Modern_Office_32x32.png
 /Modern_Office_48x48.png
 
+# LimeZu Modern Interiors purchased pack (do not commit the pack)
+1_Interiors/
+2_Characters/
+3_Animated_objects/
+4_User_Interface_Elements/
+6_Home_Designs/
+Character Generator 2.0 Linux Build/
+Modern tiles_Free/
+Modern_Interiors_RPG_Maker_Version/
+Palettes/
+/READ_ME.txt
+/THIRD-PARTY TOOLS.txt
+
+# Licensed LimeZu copies used locally by the app (not in the public repo)
+public/office/characters/
+public/office/conference-table.png
+public/office/lounge-sofa.png
+
 # Editor directories and files
 .agent-io/
 .agent-io

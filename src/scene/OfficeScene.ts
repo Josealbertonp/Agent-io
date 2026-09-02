@@ -6,9 +6,19 @@ import {
   buildFloorLayer,
   buildWallLayer,
   FURNITURE,
+  OFFICE_ZONES,
+  OFFICE_VIEW,
 } from '../view/officeMap';
 import { OFFICE_ASSET_KEYS, OFFICE_ASSET_URLS } from './officeAssets';
 import { AgentMarker } from './agentMarker';
+import {
+  CHARACTER_COUNT,
+  CHARACTER_POSE_FRAMES,
+  CHARACTER_SHEET,
+  characterAssetKey,
+  characterAssetUrl,
+  poseAnimKey,
+} from '../view/characterVisual';
 
 export const OFFICE_SCENE_KEY = 'OfficeScene';
 export const OFFICE_READY_EVENT = 'office-ready';
@@ -35,12 +45,25 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     this.load.image(OFFICE_ASSET_KEYS.plant, OFFICE_ASSET_URLS.plant);
     this.load.image(OFFICE_ASSET_KEYS.vending, OFFICE_ASSET_URLS.vending);
     this.load.image(OFFICE_ASSET_KEYS.bookshelf, OFFICE_ASSET_URLS.bookshelf);
+    this.load.image(OFFICE_ASSET_KEYS.conferenceTable, OFFICE_ASSET_URLS.conferenceTable);
+    this.load.image(OFFICE_ASSET_KEYS.loungeSofa, OFFICE_ASSET_URLS.loungeSofa);
+    for (let i = 0; i < CHARACTER_COUNT; i++) {
+      this.load.spritesheet(characterAssetKey(i), characterAssetUrl(i), {
+        frameWidth: CHARACTER_SHEET.frameWidth,
+        frameHeight: CHARACTER_SHEET.frameHeight,
+      });
+    }
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#1a1a22');
+    this.cameras.main.setBackgroundColor('#16161c');
+    this.applyOfficeCamera();
+    this.scale.on('resize', () => this.applyOfficeCamera());
+    this.registerCharacterAnims();
+    this.paintRoomBase();
     this.buildTileLayers();
     this.placeFurniture();
+    this.placeZoneLabels();
     this.ready = true;
     if (this.pendingViews) {
       this.applyViews(this.pendingViews);
@@ -120,7 +143,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     if (floorTiles) {
       const floor = floorMap.createLayer(0, floorTiles, 0, 0);
       floor?.setDepth(0);
-      floor?.setAlpha(0.38);
+      floor?.setAlpha(0.16);
     }
 
     const wallMap = this.make.tilemap({
@@ -137,6 +160,7 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
     if (wallTiles) {
       const walls = wallMap.createLayer(0, wallTiles, 0, 0);
       walls?.setDepth(1);
+      walls?.setAlpha(0.32);
     }
   }
 
@@ -151,10 +175,70 @@ export class OfficeScene extends Phaser.Scene implements AgentEntityHost {
               ? OFFICE_ASSET_KEYS.plant
               : prop.key === 'vending'
                 ? OFFICE_ASSET_KEYS.vending
-                : OFFICE_ASSET_KEYS.bookshelf;
+                : prop.key === 'conferenceTable'
+                  ? OFFICE_ASSET_KEYS.conferenceTable
+                  : prop.key === 'loungeSofa'
+                    ? OFFICE_ASSET_KEYS.loungeSofa
+                    : OFFICE_ASSET_KEYS.bookshelf;
       const sprite = this.add.image(prop.tileX * TILE_SIZE, prop.tileY * TILE_SIZE, key);
       sprite.setOrigin(0, 0);
       sprite.setDepth(prop.key === 'desk' || prop.key === 'chair' ? 5 : 4);
+      sprite.setAlpha(1);
+    }
+  }
+
+  private registerCharacterAnims(): void {
+    for (let i = 0; i < CHARACTER_COUNT; i++) {
+      for (const pose of Object.keys(CHARACTER_POSE_FRAMES) as Array<
+        keyof typeof CHARACTER_POSE_FRAMES
+      >) {
+        const spec = CHARACTER_POSE_FRAMES[pose];
+        const key = poseAnimKey(i, pose);
+        if (this.anims.exists(key)) continue;
+        this.anims.create({
+          key,
+          frames: this.anims.generateFrameNumbers(characterAssetKey(i), {
+            start: spec.start,
+            end: spec.end,
+          }),
+          frameRate: spec.frameRate,
+          repeat: spec.start === spec.end ? 0 : -1,
+        });
+      }
+    }
+  }
+
+  private applyOfficeCamera(): void {
+    this.cameras.main.setScroll(OFFICE_VIEW.scrollX, OFFICE_VIEW.scrollY);
+  }
+
+  private paintRoomBase(): void {
+    const fills: Record<string, number> = {
+      work: 0x2a2a33,
+      meeting: 0x243028,
+      lounge: 0x322820,
+      support: 0x222830,
+    };
+    const g = this.add.graphics();
+    g.setDepth(0);
+    for (const zone of OFFICE_ZONES) {
+      g.fillStyle(fills[zone.id] ?? 0x2a2a33, 1);
+      g.fillRect(zone.x * TILE_SIZE, zone.y * TILE_SIZE, zone.w * TILE_SIZE, zone.h * TILE_SIZE);
+    }
+  }
+
+  private placeZoneLabels(): void {
+    for (const zone of OFFICE_ZONES) {
+      const x = (zone.x + 0.35) * TILE_SIZE;
+      const y = zone.y * TILE_SIZE + 3;
+      const label = this.add.text(x, y, zone.label.toUpperCase(), {
+        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+        fontSize: '7px',
+        color: '#c4c4cc',
+      });
+      label.setOrigin(0, 0);
+      label.setDepth(3);
+      label.setAlpha(0.72);
     }
   }
 }

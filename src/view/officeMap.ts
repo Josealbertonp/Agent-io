@@ -11,6 +11,17 @@ export const MAP_ZOOM = 2;
 export const CANVAS_WIDTH = MAP_WIDTH * TILE_SIZE * MAP_ZOOM;
 export const CANVAS_HEIGHT = MAP_HEIGHT * TILE_SIZE * MAP_ZOOM;
 
+/**
+ * Composed camera shot: crop the outer wall field so desks and zones fill the stage.
+ * World size stays MAP_WIDTH × MAP_HEIGHT.
+ */
+export const OFFICE_VIEW = {
+  scrollX: TILE_SIZE,
+  scrollY: TILE_SIZE * 2,
+  width: (MAP_WIDTH - 2) * TILE_SIZE,
+  height: (MAP_HEIGHT - 3) * TILE_SIZE,
+} as const;
+
 /** Índices no tileset room-builder (16x16, 16 colunas). */
 export const ROOM_TILE = {
   EMPTY: -1,
@@ -46,7 +57,7 @@ export const WORKSTATIONS: readonly Workstation[] = [
 ];
 
 export interface FurnitureProp {
-  key: 'desk' | 'chair' | 'plant' | 'vending' | 'bookshelf';
+  key: 'desk' | 'chair' | 'plant' | 'vending' | 'bookshelf' | 'conferenceTable' | 'loungeSofa';
   tileX: number;
   tileY: number;
 }
@@ -57,10 +68,39 @@ export const FURNITURE: readonly FurnitureProp[] = [
     { key: 'chair' as const, tileX: s.tileX, tileY: s.tileY + 1 },
   ]),
   { key: 'plant', tileX: 9, tileY: 3 },
+  { key: 'plant', tileX: 3, tileY: 14 },
+  { key: 'plant', tileX: 8, tileY: 15 },
   { key: 'plant', tileX: 18, tileY: 14 },
   { key: 'bookshelf', tileX: 9, tileY: 4 },
+  { key: 'chair', tileX: 20, tileY: 8 },
+  { key: 'chair', tileX: 22, tileY: 8 },
+  { key: 'conferenceTable', tileX: 21, tileY: 7 },
+  { key: 'loungeSofa', tileX: 5, tileY: 14 },
   { key: 'vending', tileX: 24, tileY: 14 },
 ];
+
+export type OfficeZoneId = 'work' | 'meeting' | 'lounge' | 'support';
+
+export interface OfficeZone {
+  id: OfficeZoneId;
+  label: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Visual zones only. Agents stay at WORKSTATIONS (not relocated by status). */
+export const OFFICE_ZONES: readonly OfficeZone[] = [
+  { id: 'meeting', label: 'Meeting', x: 18, y: 6, w: 9, h: 6 },
+  { id: 'lounge', label: 'Lounge', x: 1, y: 13, w: 17, h: 4 },
+  { id: 'support', label: 'Support', x: 18, y: 13, w: 9, h: 4 },
+  { id: 'work', label: 'Work', x: 1, y: 1, w: 26, h: 12 },
+];
+
+export function zoneAtTile(x: number, y: number): OfficeZone | undefined {
+  return OFFICE_ZONES.find((z) => x >= z.x && x < z.x + z.w && y >= z.y && y < z.y + z.h);
+}
 
 export function tileToPixelCenter(tileX: number, tileY: number): { x: number; y: number } {
   return {
@@ -70,9 +110,7 @@ export function tileToPixelCenter(tileX: number, tileY: number): { x: number; y:
 }
 
 export function isRoomWallCell(x: number, y: number): boolean {
-  const outer = x === 0 || x === MAP_WIDTH - 1 || y === 0 || y === MAP_HEIGHT - 1;
-  const northInner = y === 1 && x > 0 && x < MAP_WIDTH - 1;
-  return outer || northInner;
+  return x === 0 || x === MAP_WIDTH - 1 || y === 0 || y === MAP_HEIGHT - 1;
 }
 
 export function buildFloorLayer(): number[][] {
@@ -82,10 +120,12 @@ export function buildFloorLayer(): number[][] {
     for (let x = 0; x < MAP_WIDTH; x++) {
       if (isRoomWallCell(x, y)) {
         row.push(ROOM_TILE.EMPTY);
-      } else if (y >= 14 && x >= 20) {
-        row.push(ROOM_TILE.FLOOR_LOUNGE);
       } else {
-        row.push((x + y) % 2 === 0 ? ROOM_TILE.FLOOR : ROOM_TILE.FLOOR_ALT);
+        const zone = zoneAtTile(x, y)?.id;
+        if (zone === 'lounge') row.push(ROOM_TILE.FLOOR_LOUNGE);
+        else if (zone === 'support') row.push(ROOM_TILE.FLOOR_DARK);
+        else if (zone === 'meeting') row.push(ROOM_TILE.FLOOR_ALT);
+        else row.push(ROOM_TILE.FLOOR);
       }
     }
     data.push(row);

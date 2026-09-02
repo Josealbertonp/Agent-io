@@ -2,6 +2,7 @@ import { Agent } from '../contracts';
 import { StatusVisual, statusVisualFor } from './statusVisual';
 import { resolveViewPositions } from './layout';
 import { LABEL, resolveMetaOffsets } from './labelLayout';
+import { characterIndexForAgentId } from './characterVisual';
 
 export interface AgentView {
   id: string;
@@ -17,6 +18,7 @@ export interface AgentView {
   model: string;
   providerBadge: string;
   metaOffsetY: number;
+  characterIndex: number;
 }
 
 function providerBadge(provider: string, model: string): string {
@@ -44,6 +46,7 @@ export function toAgentView(agent: Agent, layout: { x: number; y: number; usedFa
     model: agent.model,
     providerBadge: providerBadge(agent.provider, agent.model),
     metaOffsetY: LABEL.metaOffsetY,
+    characterIndex: characterIndexForAgentId(agent.id),
   };
 }
 

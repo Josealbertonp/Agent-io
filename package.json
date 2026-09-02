@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "bridge": "tsx src/bridge/server.ts"
+    "bridge": "tsx src/bridge/server.ts",
+    "verify:assets": "tsx scripts/verify-assets.ts"
   },
   "dependencies": {
     "phaser": "^3.87.0",
